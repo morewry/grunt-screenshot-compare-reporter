@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "q": "1.0.1",
-    "resemble": "1.0.3",
+    "resemble": "1.2.1",
     "mkdirp": "0.5.0",
     "bluebird": "2.3.x",
     "simple-ioc-extra": "latest"
