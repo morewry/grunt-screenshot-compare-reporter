@@ -1,18 +1,21 @@
-iocExtra = require("simple-ioc-extra")
+spurIoc = require("spur-ioc")
 
-module.exports = ()->
-  ioc = iocExtra()
-  ioc.reset()
-  ioc.registerLibraries {
-    "Promise"   :"bluebird"
-    "resemble"  :"resemble"
-    "mkdirp"    :"mkdirp"
-    "_"         :"underscore"
-    "path"      :"path"
+module.exports = () ->
+  ioc = spurIoc.create("compare-reporter")
+
+  ioc.registerDependencies {
+    "Promise": require("bluebird")
+    "gm" : require("gm").subClass({ imageMagick: true })
+    "mkdirp": require("mkdirp")
+    "_": require("lodash")
+    "path": require("path")
+    "fs": require("fs")
+    "domain": require("domain")
   }
 
-  ioc.registerDirectories __dirname, [
-    "/runtime", "/util"
+  ioc.registerFolders __dirname, [
+    "runtime"
+    "util"
   ]
 
   ioc

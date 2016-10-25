@@ -1,3 +1,2 @@
-fs = require "fs"
-module.exports = (Promise)->
+module.exports = (fs, Promise) ->
   Promise.promisifyAll(fs)

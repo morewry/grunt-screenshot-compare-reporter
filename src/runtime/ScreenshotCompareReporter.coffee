@@ -1,31 +1,31 @@
-module.exports = (Util, Promise, _, FileUtils, PlatformReporter, options, HTMLReporter)->
+module.exports = (Util, Promise, _, FileUtils, PlatformReporter, options, HTMLReporter) ->
 
   class ScreenshotCompareReporter
 
 
-    constructor:()->
+    constructor: () ->
       @baselineDir = options.baselineDirectory
       @sampleDir = options.sampleDirectory
       @reportDir = options.reportDirectory
 
 
-    run:()->
+    run: () ->
       Util.promiseQueue([
         @getPlatforms
         @testPlaforms
         @writeHtmlReport
-      ]).then ()=> @
+      ]).then () => @
 
-    testPlaforms:()=>
+    testPlaforms: () =>
       Promise.all(
         _.map(@platforms, PlatformReporter.run)
-      ).then (results)=>
-        @results = _.indexBy(results, "platform")
+      ).then (results) =>
+        @results = _.sortedIndexBy(results, "platform")
 
 
-    getPlatforms:()=>
+    getPlatforms: () =>
       FileUtils.flatDirectoryNames([@baselineDir, @sampleDir])
-        .then (@platforms)=>
+        .then (@platforms) =>
 
-    writeHtmlReport:()=>
+    writeHtmlReport: () =>
       HTMLReporter.write(@results)
