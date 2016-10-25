@@ -1,6 +1,6 @@
 domain = require('domain')
 
-module.exports = (options, path, Util, Promise, fsPromise, FileDef, _, resemble)->
+module.exports = (options, path, Util, Promise, fsPromise, FileDef, _, gm)->
 
   {baselineDirectory, sampleDirectory} = options
 
@@ -8,29 +8,29 @@ module.exports = (options, path, Util, Promise, fsPromise, FileDef, _, resemble)
 
     THRESHOLD:0
 
-    constructor:(@filename, @platform)->
+    constructor: (@filename, @platform) ->
       @name = @filename.replace(".png", "")
 
       @diffFilepath = path.join(options.reportDirectory, @platform, @name+"-diff.png")
       @diffUrl = path.join(@platform, @name+"-diff.png")
 
-    @compare:(filename, platform)->
+    @compare: (filename, platform) ->
       new ImageComparison(filename, platform).compare()
 
-    compare:()->
+    compare: () ->
       Util.promiseQueue [
         @copyFiles
         @runCompare
       ]
 
-    copyFiles:()=>
+    copyFiles: () =>
       Promise.props({
         baselineFile:FileDef.makeCopy("baseline", @platform, @filename)
         sampleFile:FileDef.makeCopy("sample", @platform, @filename)
-      }).then (results)=> _.extend(@, results)
+      }).then (results) => _.extend(@, results)
 
 
-    runCompare:()=>
+    runCompare: () =>
       unless @baselineFile.exists and @sampleFile.exists
         @result = {
           name:@name
@@ -44,51 +44,41 @@ module.exports = (options, path, Util, Promise, fsPromise, FileDef, _, resemble)
         }
         Promise.resolve(@result)
       else
-        @runResemble()
+        @runGm()
 
-    resemblePromise:(image1, image2)-> new Promise (resolve, reject)=>
-      d = domain.create()
-      d.on "error", (e)->
-        resolve()
-      d.run ->
-        resemble
-          .resemble(image1)
-          .compareTo(image2)
-          .onComplete(resolve)
+    gmPromise: (image1, image2) ->
+      diffOpts =
+        tolerance: @THRESHOLD
+        file: @diffFilepath
+      return new Promise (resolve, reject) =>
+        d = domain.create()
+        d.on "error", (e) ->
+          resolve()
+        d.run ->
+          gm
+          # .subClass({ imageMagick: true })
+          .compare(image1, image2, diffOpts, resolve)
 
-
-
-    runResemble:()->
-      @resemblePromise(@sampleFile.filepath, @baselineFile.filepath)
+    runGm: () ->
+      @gmPromise(@sampleFile.filepath, @baselineFile.filepath)
         .then(@differenceResult)
-        .catch (e)->
+        .catch (e) ->
 
-    storeScreenshot: (rawData)->
-      data = rawData.replace(/^data:image\/png;base64,/,"")
-      fsPromise.writeFileAsync(@diffFilepath, data, encoding:"base64")
-
-
-    differenceResult:(difference)=>
-      hasDifference = parseInt(difference.misMatchPercentage) > @THRESHOLD
-
-      @result = {
-        @name
-        failed: hasDifference
-        difference
-        files: {
-          sample:@sampleFile
-          base:@baselineFile
-          diff:
-            exists:true
-            filepath:@diffFilepath
-            url:@diffUrl
-        }
-      }
-
-      diffScreenshot = difference.getImageDataUrl()
-
-      if diffScreenshot
-        @storeScreenshot(diffScreenshot)
-          .then => @result
+    differenceResult: (err, isEqual, equality, raw) =>
+      console.log "differenceResult", err, isEqual, equality, raw
+      if err
+        return Promise.reject(err)
       else
-        Promise.resolve(@result)
+        return Promise.resolve({
+          @name
+          failed: !isEqual
+          equality: equality
+          files: {
+            sample:@sampleFile
+            base:@baselineFile
+            diff:
+              exists:true
+              filepath:@diffFilepath
+              url:@diffUrl
+          }
+        })
