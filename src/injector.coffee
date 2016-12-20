@@ -1,19 +1,20 @@
-iocExtra = require("simple-ioc-extra")
+spurIoc = require("spur-ioc")
 
-module.exports = ()->
-  ioc = iocExtra()
-  ioc.reset()
-  ioc.registerLibraries {
-    "Promise"   :"bluebird"
-    "resemble"  :"resemble"
-    "mkdirp"    :"mkdirp"
-    "_"         :"underscore"
-    "path"      :"path"
-    "imageDiff" :"image-diff"
+module.exports = () ->
+  ioc = spurIoc.create("grunt-screenshot-compare-reporter")
+
+  ioc.registerDependencies {
+    "Promise": require("bluebird")
+    "mkdirp": require("mkdirp")
+    "_": require("underscore")
+    "path": require("path")
+    "fs": require("fs")
+    "imageDiff": require("image-diff")
   }
 
-  ioc.registerDirectories __dirname, [
-    "/runtime", "/util"
+  ioc.registerFolders __dirname, [
+    "runtime/",
+    "util/"
   ]
 
   ioc
