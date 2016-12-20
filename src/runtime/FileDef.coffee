@@ -1,8 +1,8 @@
-module.exports = (path, fsPromise, options, FileUtils)->
+module.exports = (path, fsPromise, options, FileUtils) ->
 
   class FileDef
 
-    constructor:(type, platform, filename)->
+    constructor: (type, platform, filename) ->
       name = filename.replace(".png", "")
 
       fullPath = path.join(
@@ -13,11 +13,11 @@ module.exports = (path, fsPromise, options, FileUtils)->
         @filepath = path.join(options.reportDirectory, platform, "#{name}-#{type}.png")
         @url = path.join(platform, "#{name}-#{type}.png")
         FileUtils.copyFile(fullPath, @filepath)
-          .catch (e)=>
+          .catch (e) =>
             delete @fullPath
             delete @url
             @exists = false
 
 
-    @makeCopy:(type, platform, filename)->
+    @makeCopy: (type, platform, filename) ->
       new FileDef(type, platform, filename)

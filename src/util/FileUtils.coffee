@@ -1,41 +1,40 @@
-module.exports = (fsPromise, path, Promise, _)->
-  fs = fsPromise
+module.exports = (fsPromise, path, Promise, _) ->
 
   new class FileUtils
 
-    directoryFilter:(dir)-> (file)->
+    directoryFilter: (dir) -> (file) ->
       return false if file[0] is "."
       fsPromise.statAsync(path.join(dir,file))
-        .then (stat)-> stat.isDirectory()
+        .then (stat) -> stat.isDirectory()
 
-    fileFilter:(dir)-> (file)->
+    fileFilter: (dir) -> (file) ->
       return false if file[0] is "."
       fsPromise.statAsync(path.join(dir,file))
-        .then (stat)-> stat.isFile()
+        .then (stat) -> stat.isFile()
 
-    getDirectories:(dir)=>
+    getDirectories: (dir) =>
       fsPromise.readdirAsync(dir)
         .filter(@directoryFilter(dir))
-        .catch ()-> []
+        .catch () -> []
 
-    getFiles:(dir)=>
+    getFiles: (dir) =>
       fsPromise.readdirAsync(dir)
         .filter(@fileFilter(dir))
-        .catch ()-> []
+        .catch () -> []
 
-    flattenUniq:(results)-> _.uniq _.flatten(results)
+    flattenUniq: (results) -> _.uniq _.flatten(results)
 
-    flatDirectoryNames:(directories)->
+    flatDirectoryNames: (directories) ->
       Promise.all(_.map(directories, @getDirectories))
         .then(@flattenUniq)
 
-    flatFilenames:(directories)->
+    flatFilenames: (directories) ->
       Promise.all(_.map(directories, @getFiles))
         .then(@flattenUniq)
 
-    copyFile: (file, dest) -> new Promise (resolve, reject)->
-      rs = fs.createReadStream(file)
-      ws = fs.createWriteStream(dest)
+    copyFile: (file, dest) -> new Promise (resolve, reject) ->
+      rs = fsPromise.createReadStream(file)
+      ws = fsPromise.createWriteStream(dest)
       rs.on "close", resolve
       rs.on "error", reject
       ws.on "error", reject

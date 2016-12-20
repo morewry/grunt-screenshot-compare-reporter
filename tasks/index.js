@@ -6,7 +6,7 @@ module.exports = function (grunt) {
     var options = this.options(this.data)
     var cb = this.async();
     injector()
-      .replaceDependency("options", options)
+      .addDependency("options", options)
       .inject(function(ScreenshotCompareReporter){
 
         new ScreenshotCompareReporter().run().then(function(report){

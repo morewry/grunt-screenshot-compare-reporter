@@ -1,18 +1,24 @@
-iocExtra = require("simple-ioc-extra")
+path = require("path")
+fs = require("fs")
+spurIoc = require("spur-ioc")
 
-module.exports = ()->
-  ioc = iocExtra()
-  ioc.reset()
-  ioc.registerLibraries {
-    "Promise"   :"bluebird"
-    "resemble"  :"resemble"
-    "mkdirp"    :"mkdirp"
-    "_"         :"underscore"
-    "path"      :"path"
+module.exports = () ->
+  ioc = spurIoc.create("compare-reporter")
+
+  ioc.registerDependencies {
+    "Promise": require("bluebird")
+    "resemble" : require("resemble")
+    "mkdirp": require("mkdirp")
+    "_": require("lodash")
+    "path": require("path")
+    "fs": require("fs")
+    "domain": require("domain")
+    "reportTemplate": fs.readFileSync(path.join(__dirname, "template/report.html"), "utf-8")
   }
 
-  ioc.registerDirectories __dirname, [
-    "/runtime", "/util"
+  ioc.registerFolders __dirname, [
+    "runtime/"
+    "util/"
   ]
 
   ioc

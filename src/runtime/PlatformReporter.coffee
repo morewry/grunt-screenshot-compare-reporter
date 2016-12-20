@@ -1,36 +1,34 @@
-module.exports = (options, _, Util, Promise, FileUtils, path, ImageComparison, mkdirpAsync)->
+module.exports = (options, _, Util, Promise, FileUtils, path, ImageComparison, mkdirpAsync) ->
 
 
   class PlatformReporter
 
-    constructor:(@platform)->
+    constructor: (@platform) ->
       @baselinePlatform = path.join(options.baselineDirectory,@platform)
       @samplePlatform = path.join(options.sampleDirectory,@platform)
 
-    @run:(platform)->
+    @run: (platform) ->
       new PlatformReporter(platform).run()
 
-
-    run:()->
+    run: () ->
       Util.promiseQueue([
         @getAllFiles
         @createReportDir
         @compareFiles
-      ]).then ()=> @
+      ]).then () => @
 
-    createReportDir:()=>
+    createReportDir: () =>
       mkdirpAsync path.join(options.reportDirectory, @platform)
 
-    getAllFiles:()=>
+    getAllFiles: () =>
       FileUtils.flatFilenames([@baselinePlatform, @samplePlatform])
-        .then (@filenames)=>
+        .then (@filenames) =>
 
-
-    compareFiles:()=>
+    compareFiles: () =>
       Promise.map(@filenames, @compareFile, {concurrency:10})
-        .then (@results)=>
+        .then (@results) =>
+          console.log "compareFiles", arguments
           @results = _.compact(@results)
 
-    compareFile:(filename)=>
+    compareFile: (filename) =>
       ImageComparison.compare(filename, @platform)
-

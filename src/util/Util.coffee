@@ -1,8 +1,8 @@
-module.exports = (Promise)->
+module.exports = (Promise) ->
 
   new class Util
 
-    promiseQueue:(fns)->
+    promiseQueue: (fns) ->
       queue = Promise.resolve(true)
       for fn in fns
         queue = queue.then(fn)

@@ -8,7 +8,7 @@ describe.only "ScreenshotCompareReporter", ->
       sampleDirectory:path.resolve(__dirname, "../resources/baseline")
       baselineDirectory:path.resolve(__dirname, "../resources/sample")
     injector()
-      .replaceDependency("options", @options)
+      .addDependency("options", @options)
       .inject (@ScreenshotCompareReporter)=>
 
 
@@ -17,7 +17,7 @@ describe.only "ScreenshotCompareReporter", ->
   it "should exist", ->
     expect(@ScreenshotCompareReporter).to.exist
 
-  it.only "getPlatforms()", (done)->
+  it "getPlatforms()", (done)->
     @reporter.getPlatforms().then (@results)=>
       expect(@reporter.platforms).to.deep.equal (
         [ 'LINUX_chrome_35', 'MAC_chrome_35', 'WINDOWS_chrome_35' ]
@@ -28,4 +28,3 @@ describe.only "ScreenshotCompareReporter", ->
     @reporter.run().then ()=>
       console.log @reporter
       done()
-
