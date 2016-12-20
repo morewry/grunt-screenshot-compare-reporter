@@ -9,6 +9,7 @@ module.exports = ()->
     "mkdirp"    :"mkdirp"
     "_"         :"underscore"
     "path"      :"path"
+    "imageDiff" :"image-diff"
   }
 
   ioc.registerDirectories __dirname, [
