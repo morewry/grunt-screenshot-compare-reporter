@@ -8,7 +8,7 @@ describe.only "ScreenshotCompareReporter", ->
       sampleDirectory:path.resolve(__dirname, "../resources/baseline")
       baselineDirectory:path.resolve(__dirname, "../resources/sample")
     injector()
-      .replaceDependency("options", @options)
+      .addDependency("options", @options)
       .inject (@ScreenshotCompareReporter)=>
 
 
@@ -28,4 +28,3 @@ describe.only "ScreenshotCompareReporter", ->
     @reporter.run().then ()=>
       console.log @reporter
       done()
-

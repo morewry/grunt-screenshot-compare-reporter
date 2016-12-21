@@ -1,4 +1,4 @@
-module.exports = (options, fsPromise, path)->
+module.exports = (options, fsPromise, path) ->
   class HTMLReporter
 
     htmlReport:"""
@@ -775,12 +775,12 @@ module.exports = (options, fsPromise, path)->
       @resultsDir = options.reportDirectory
       @failed = false
 
-    @write:(report)->
+    @write: (report) ->
       new HTMLReporter(report).saveReport()
 
     addTestResult: (platform, results) ->
       @report[platform] = results
-      @failed = true if results.filter((result) -> result.failed ).length > 0
+      @failed = true if results.filter((result) -> result.failed).length > 0
 
     addHtmlReportViewer: =>
       fsPromise.writeFileAsync(path.join(@resultsDir, "reporter.html"), @htmlReport)

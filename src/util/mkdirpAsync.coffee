@@ -1,2 +1,2 @@
-module.exports = (Promise, mkdirp)->
+module.exports = (Promise, mkdirp) ->
   Promise.promisify(mkdirp)
